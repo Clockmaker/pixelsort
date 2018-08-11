@@ -5,12 +5,10 @@
 <style>
 html,body{min-height:100%;margin:0;background-color:#EFEFEF;font-family:sans-serif;font-size:12px;}
 #wrap{margin:1em auto;width:60%;}
-canvas{display:block}
-rect{
-/*width:1vw;
-height:1vw;*/
-}
+canvas{display:block;width:100%;}
 
+/*Mobile*/
+@media(max-width: 768px){html{font-size:12px;}#wrap{margin:1em 4px;}}
 </style>
 </head><body>
 <div id="wrap">
@@ -20,25 +18,21 @@ height:1vw;*/
   <option value='8'> 8 px</option>
   <option value='16'>16 px</option>
   <option value='32'>32 px</option>
-</select> 
-<button onclick="p.play()">Play/Stop</button>
-<button onclick="refresh()">Refresh</button>
-<button onclick="p.reset()">Reset</button>
+ </select> 
+ <button onclick="p.play()">Play/Stop</button>
+ <button onclick="p.reset()">Reset</button>
 <br/>
-<details>
-<summary>Sorting Algorithms</summary>
+ <details>
+ <summary>Sorting Algorithms</summary>
     <div id="algorithms"></div>
-    
-</details>
+ </details>
 
-<div id="sandbox">
-
-</div>
+<div id="sandbox"></div>
 </div>
 <script src="https://d3js.org/d3.v5.min.js"></script>
 <script>
 
-var canvas_width = 960, canvas_height=80;
+var canvas_width = 880, canvas_height=80;
 
 var 
 tile_size = 4,
