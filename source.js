@@ -1,27 +1,4 @@
 "use strict"; 
-/*
-parula
-53,42,135
-3,99,225
-20,133,212
-6,167,198
-56,185,158
-146,191,115
-217,186,86
-252,206,46
-249,251,14
-
-viridis
-68,1,84
-71,44,122
-59,81,139
-44,113,142
-33,144,141
-39,173,129
-92,200,99
-170,220,50
-253,231,37
-*/
 
 function quicksort(array, compare_fn){
 	function _quicksort(array, from, to, compare_fn){
@@ -69,8 +46,6 @@ function lampsort(array, compare_fn){
 	}
 return array;
 }
-
-
 
 
 function quicksort_dualpivot(array, compare_fn){
@@ -171,53 +146,37 @@ function insertionsort_binary2(array, compare_fn){
 return array;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+/* 
+ * Benchmarking/Testing
+ * 
+ */
 
 function grid(size){
 	var points= [];
 	for(var x=0; x<size; x++)
 		for(var y=0; y<size;y++)
 			points.push([x,y]);
-
-	
-	//var t = '';for(var x=0; x<size; x++){for(var y=0; y<size;y++) {t+= points[x+y+x*y]+' ';}console.log(t);t='';}
-	return points;
+    return points;
 }
-
 
 function noise(count){
     var points = [];
-	points[1] = [];
+	points[0] = [];
     for (let i = 0; i < count; i++) {
         points.push([Math.random() * 1e3, Math.random() * 1e3]);
     }
 	return points;
 }
 
-
-
 function check_sort(array, sorted){
 	var size = array.length-1;
 	for(var i=0; i<size; i++) {
 		if(array[i] !== sorted[i]){
-			console.log('sort error: element ['+i+'] '+array[i]+' != '+sorted[i]);
+			console.log('sorting error: element ['+i+'] '+array[i]+' != '+sorted[i]);
 			console.log(array);
 		return;
 		}
 	}
-	//return console.log('ok');
 }
 
 function benchmarksort(fn, compare_fn, unsorted, sorted=[]){
@@ -259,13 +218,9 @@ var m = array.length, r;
 return array;
 }
 
-/*/
-//setTimeout(function(){
 
-
-//var test = [12,2,3,33,444,3,123,3,6,7,8,10,11,12,14,15,17];
-
-var sample = [10,100], size, sorted, unsorted, cmp;
+/* Main */
+var sample = [10,100,1000], size, sorted, unsorted, cmp;
 
 for(size=0;size<sample.length; size++){
 	sorted = linspace(0,10,sample[size]);
@@ -276,10 +231,4 @@ for(size=0;size<sample.length; size++){
 		[quicksort,lampsort, dualpivot_quicksort,
 		insertionsort,insertionsort_binary, insertionsort_binary2
 		], cmp, unsorted);
-
-
-
 }
-
-*/
-//},1);
