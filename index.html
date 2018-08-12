@@ -13,13 +13,14 @@ canvas{display:block;width:100%;}
 </style>
 </head><body>
 <div id="wrap">
+ <select id="tile_color">
+ </select>
  <select id="tile_size">
   <option value='2'> 2 px</option>
   <option value='4' selected> 4 px</option>
   <option value='8'> 8 px</option>
   <option value='16'>16 px</option>
-  <option value='32'>32 px</option>
- </select> 
+ </select>
  <button onclick="p.play()">Play/Stop</button>
  <button onclick="p.reset()">Reset</button>
 <br/>
@@ -41,8 +42,16 @@ default_tile_row = canvas_height/default_tile_size ,
 default_tile_col = canvas_width/default_tile_size,
 tile = {col:default_tile_col, row:default_tile_row, size:default_tile_size};
 
-var color = d3.scaleSequential(d3.interpolateViridis).domain([0,default_tile_col]);
+var color = d3.scaleSequential(d3.interpolateViridis).domain([0,tile.col]);
 
+var colormap = ["Viridis", "Rainbow", "Greys"];
+var colorselect = document.getElementById("tile_color");
+colormap.forEach((map)=>{colorselect.innerHTML +='<option value="'+map+'">'+map+'</option>';});
+colorselect.addEventListener("change", function(e){
+    color = d3.scaleSequential(d3["interpolate"+e.target.value]).domain([0,tile.col]);
+    p.rebuild();
+    p.startAll();
+});
 
 var cmp = (a,b)=>{return a>b};
 
