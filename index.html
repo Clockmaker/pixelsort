@@ -6,6 +6,7 @@
 <style>
 html,body{min-height:100%;margin:0;background-color:#EFEFEF;font-family:sans-serif;font-size:12px;}
 #wrap{margin:1em auto;width:60%;}
+#sandbox{margin-top:2em;}
 canvas{display:block;width:100%;}
 
 /*Mobile*/
@@ -44,6 +45,15 @@ tile = {col:default_tile_col, row:default_tile_row, size:default_tile_size};
 
 var color = d3.scaleSequential(d3.interpolateViridis).domain([0,tile.col]);
 
+var cmp = (a,b)=>{return a>b};
+
+
+/**/
+if(window.location.hash){
+tile.size = Number(window.location.hash.substring(1));
+}
+
+
 var colormap = ["Viridis", "Rainbow", "Greys"];
 var colorselect = document.getElementById("tile_color");
 colormap.forEach((map)=>{colorselect.innerHTML +='<option value="'+map+'">'+map+'</option>';});
@@ -53,16 +63,12 @@ colorselect.addEventListener("change", function(e){
     p.startAll();
 });
 
-var cmp = (a,b)=>{return a>b};
-
-
-/**/
 
 document.getElementById("tile_size").addEventListener("change",function(e){
     tile.size = Number(e.target.value);
     tile.col = canvas_width/tile.size;
     tile.row = canvas_height/tile.size;
-color = d3.scaleSequential(d3.interpolateViridis).domain([0,tile.col])
+color = d3.scaleSequential(d3["interpolate"+colorselect.value]).domain([0,tile.col])
 p.setup(grid(tile.col, tile.row), cmp);
 //p.tileset('#sandbox', tile);
 //p.add(insertionsort, insertionsort_binary, quicksort, quicksort_dualpivot);
@@ -71,32 +77,42 @@ p.startAll();
 });
 
 
-var pixelcanvas = function(node_id, unsorted_array, swap, tile = {col:100, row:1, size:10}) {
-    this.canvas = d3.select(node_id)
+var pixelcanvas = function(parent_id, tile = {col:100, row:1, size:10}, canvas_class=null) {
+    this.canvas = d3.select(parent_id)
             .append("canvas")
             .attr("width", tile.col*tile.size)
             .attr("height", tile.row*tile.size);
+    if(canvas_class) this.canvas.attr("class", canvas_class);
     this.context = this.canvas.node().getContext("2d");
-
-    this.array = unsorted_array.slice(0);
-    this.frame = swap.slice(0);
 
     this.row = tile.row;
     this.tile = {col:tile.col, row:tile.row, size:tile.size};
+    
 
-    this.play = true;
+    this.play = false;
 };
 
 pixelcanvas.prototype = {
+    animate: function(unsorted_array, swap){
+        this.array = unsorted_array.slice(0);
+        this.frame = swap.slice(0);
+        //
+        let max = 0;
+        this.frame.forEach((r)=>{if(max < r.length) max=r.length;})
+        
+        this.frame_length = max;
+        
+        this.reset();
+        //return this.frame_lenght;
+    },
     start: function(){
-        //this.reset();
         this.play = true;
         requestAnimationFrame(this.draw.bind(this));
     },
     stop: function(){
         this.play = false;
     },
-    reset : function(){
+    reset: function(){
         for(var row = 0; row < this.row; row++){
             this.array[row].forEach((d,i)=>{this.draw_tile(i, row, d);});
         }
@@ -118,7 +134,6 @@ pixelcanvas.prototype = {
                 this.draw_tile(s[1], row, s[3]);
             }else{
                 end--;
-
             }
         }
         this.step++
@@ -172,12 +187,13 @@ function pixelsort(array, compare_fn){
 //uhm?      
             //var fn = algo;
             //careful: global row and swap_history
+            swap_history = [];
             for(row=0; row < this.tile.row; row++){
                 swap_history[row] = [];
                 algo(this.array[row].slice(0), this.compare);
             }
-            this.fn_list[name] = new pixelcanvas(this.node_id, this.array, swap_history, this.tile);
-            this.fn_list[name].reset();
+            this.fn_list[name] = new pixelcanvas(this.node_id, this.tile);
+            this.fn_list[name].animate(this.array, swap_history);
             this.fn[name] = window[name];
   }
         //this.fn_list[algo.name].start();
@@ -225,9 +241,6 @@ function pixelsort(array, compare_fn){
 }
 
 
-if(window.location.hash){
-tile.size = Number(window.location.hash.substring(1));
-}
 
 
 
