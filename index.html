@@ -36,12 +36,13 @@ canvas{display:block;width:100%;}
 var canvas_width = 880, canvas_height=80;
 
 var 
-tile_size = 4,
-tile_row = canvas_height/tile_size ,
-tile_col = canvas_width/tile_size,
-tile = {col:tile_col, row:tile_row, size:tile_size};
+default_tile_size = 4,
+default_tile_row = canvas_height/default_tile_size ,
+default_tile_col = canvas_width/default_tile_size,
+tile = {col:default_tile_col, row:default_tile_row, size:default_tile_size};
 
-var color = d3.scaleSequential(d3.interpolateViridis).domain([0,tile_col]);
+var color = d3.scaleSequential(d3.interpolateViridis).domain([0,default_tile_col]);
+
 
 var cmp = (a,b)=>{return a>b};
 
@@ -58,7 +59,6 @@ p.setup(grid(tile.col, tile.row), cmp);
 //p.add(insertionsort, insertionsort_binary, quicksort, quicksort_dualpivot);
 p.rebuild();
 p.startAll();
-
 });
 
 
@@ -224,7 +224,7 @@ tile.size = Number(window.location.hash.substring(1));
 
 var p;
 
-p = new pixelsort(grid(tile_col, tile_row), cmp);
+p = new pixelsort(grid(default_tile_col, default_tile_row), cmp);
 p.tileset('#sandbox', tile);
 p.add(insertionsort, quicksort);
 
