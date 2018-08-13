@@ -65,7 +65,7 @@ pixelcanvas.prototype = {
         //
         let max = 0;
         this.frame.forEach((r)=>{if(max < r.length) max=r.length;})
-        
+        this.loop = true;
         this.duration = max;
         this.frame_length = max;
         
@@ -101,11 +101,11 @@ pixelcanvas.prototype = {
                 this.draw_tile(s[1], row, s[3]);
             }
         }
-        this.step++
+        this.step++;
         if(this.step > this.duration){
-            this.reset()
+            this.reset();
         }
-        if(this.play) requestAnimationFrame(this.draw.bind(this));
+        if(this.play && this.loop) requestAnimationFrame(this.draw.bind(this));
     }
 
 };
@@ -149,6 +149,33 @@ function pixelsort(array, compare_fn){
             this.fn_list[key].animate(this.array, swap_history);
             this.fn_ptr[key] = algo;//window[key];
     };
+    this.loop = function(mode=1){
+        var k;
+        switch(mode){
+            case 1: //simple loop
+                for(k in this.fn_list){
+                    this.fn_list[k].loop = true;
+                    this.fn_list[k].duration = this.frame_length;
+                };
+            break;
+            case 2: //synched loop
+                var longest = 0
+                for(k in this.fn_list){
+                    if(longest < this.fn_list[k].frame_length) 
+                        longest = this.fn_list[k].frame_length;
+                };
+                for(k in this.fn_list){
+                    this.fn_list[k].loop = true;
+                    this.fn_list[k].duration = longest;
+                };
+            break;
+            default: //no loop
+                for(k in this.fn_list){
+                    this.fn_list[k].loop = false;
+                    this.fn_list[k].duration = this.fn_list[k].frame_length;
+                };
+        }
+    }
     this.clear = function(){
         for(var key in this.fn_list){
             this.destroy(key);
@@ -268,7 +295,7 @@ tag.className = "tag";
 tag.innerHTML = "insertionsort"
 d.appendChild(tag);
 
-
+p.loop(2);
 p.startAll();
 
 var chk = document.getElementById("algorithms");
