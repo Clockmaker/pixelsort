@@ -238,7 +238,7 @@ var colorselect = document.getElementById("tile_color");
 colormap.forEach((map)=>{colorselect.innerHTML +='<option value="'+map+'">'+map+'</option>';});
 colorselect.addEventListener("change", function(e){
     color = d3.scaleSequential(d3["interpolate"+e.target.value]).domain([0,tile.col]);
-    p.rebuild();
+    build();
     p.startAll();
 });
 
@@ -250,7 +250,7 @@ tileselect.addEventListener("change",function(e){
     tile.row = canvas_height/tile.size;
     color = d3.scaleSequential(d3["interpolate"+colorselect.value]).domain([0,tile.col])
     p.setup(grid(tile.col, tile.row), cmp);
-    p.rebuild();
+   build();
     p.startAll();
 });
 
