@@ -6,10 +6,10 @@
 <style>
 html,body{min-height:100%;margin:0;background-color:#EFEFEF;font-family:sans-serif;font-size:12px;}
 #wrap{margin:1em auto;width:60%;}
-#sandbox{margin-top:2em;}
+#sandbox{margin:2em auto;display:table;}
 canvas{display:block;}
 .sort{position:relative;float:left;}
-.tag {position:absolute;display:inline; left:4px;top:8px;background-color:rgba(0,0,0,.7);color:#FFF;padding:4px}
+.tag {position:absolute;display:inline-block; left:4px;top:8px;background-color:rgba(0,0,0,.7);color:#FFF;padding:4px}
 /*Mobile*/
 @media(max-width: 960px){html{font-size:12px;}#wrap{margin:1em 1%;width:98%;}
 </style>
@@ -24,11 +24,13 @@ canvas{display:block;}
   <option value='16'>16 px</option>
  </select>
  <button onclick="p.play()">Play/Stop</button>
- <button onclick="p.reset()">Reset</button>
 <br/>
  <details>
  <summary>Sorting Algorithms</summary>
-    <div id="algorithms"></div>
+    <div id="algorithms">
+    </div>
+ <button onclick="build()">Update</button>
+ <button onclick="p.reset()">Reset</button>
  </details>
 
 <div id="sandbox"></div>
@@ -42,18 +44,17 @@ default_tile_size = 8,
 default_tile_row = canvas_height/default_tile_size ,
 default_tile_col = canvas_width/default_tile_size,
 tile = {col:default_tile_col, row:default_tile_row, size:default_tile_size};
+var cmp = (a,b)=>{return a>b};
 /*************************************************************/
-var pixelcanvas = function(dom, tile = {col:100, row:1, size:10}, canvas_class=null) {
+var pixelcanvas = function(dom, tile = {col:100, row:1, size:10}) {
     this.canvas = document.createElement("canvas");
     this.canvas.width = tile.col*tile.size;
     this.canvas.height = tile.row*tile.size;
     dom.appendChild(this.canvas);
-    if(canvas_class) this.canvas.attr("class", canvas_class);
     this.context = this.canvas.getContext("2d");
 
     this.row = tile.row;
     this.tile = {col:tile.col, row:tile.row, size:tile.size};
-    
 
     this.play = false;
 };
@@ -115,20 +116,20 @@ function pixelsort(array, compare_fn){
     this.compare = compare_fn;
     this.fn_list = {};
     this.fn_ptr = {};
-    this.fn_dom = {};
     this.run = true;
     this.tile = {col:100, row:1, size:1};
     this.dom = document.body;
+    this.loop_mode = 1;
 
     this.tileset = function(tile){
         this.tile = tile;
     };
-    this.attach = function(dom){
-        this.dom = dom;
-    };
     this.setup = function(array, compare_fn){
         this.array = array;
         this.compare = compare_fn;
+    };
+    this.attach = function(dom){
+        this.dom = dom;
     };
     //TODO: create multiple istances for the same algorithm
     this.create = function(algo){
@@ -140,16 +141,14 @@ function pixelsort(array, compare_fn){
                 swap_history[row] = [];
                 algo(this.array[row].slice(0), this.compare);
             }
-            var dom = this.fn_dom[key];
-            if(!dom){
-                dom = this.dom;
-                this.fn_dom[key] = dom;
-            }
-            this.fn_list[key] = new pixelcanvas(dom, this.tile);
+            
+            this.fn_list[key] = new pixelcanvas(this.dom, this.tile);
             this.fn_list[key].animate(this.array, swap_history);
             this.fn_ptr[key] = algo;//window[key];
+            this.loop(this.loop_mode);
     };
     this.loop = function(mode=1){
+        this.loop_mode = mode;
         var k;
         switch(mode){
             case 1: //simple loop
@@ -186,21 +185,24 @@ function pixelsort(array, compare_fn){
             this.fn_list[key].reset();
         }
     };
-
+/*// FIXME: broken code
     this.rebuild = function(){
         for(var key in this.fn_list){
             this.remove(key);
             this.create(this.fn_ptr[key]);
         }
-    }
+    };
     this.remove = function(algo){
         var name = (typeof algo === 'function') ? algo.name
                                                 : algo;
         this.fn_list[name].canvas.remove();
     };
+*/
     this.destroy = function(algo){
-        this.remove(algo);
-        delete this.fn_list[name];
+        //this.remove(algo);
+        this.fn_list = {};
+        //this.fn_ptr = {};
+        this.dom = document.body;
     };
     this.startAll = function(){
         for(var key in this.fn_list){
@@ -221,13 +223,14 @@ function pixelsort(array, compare_fn){
 
 var color = d3.scaleSequential(d3.interpolateViridis).domain([0,tile.col]);
 
-var cmp = (a,b)=>{return a>b};
 
 
-/**/
+
+/*
 if(window.location.hash){
 tile.size = Number(window.location.hash.substring(1));
 }
+*/
 
 
 var colormap = ["Viridis", "Rainbow", "Greys"];
@@ -239,17 +242,16 @@ colorselect.addEventListener("change", function(e){
     p.startAll();
 });
 
-
-document.getElementById("tile_size").addEventListener("change",function(e){
+var tileselect = document.getElementById("tile_size");
+tileselect.value = tile.size;
+tileselect.addEventListener("change",function(e){
     tile.size = Number(e.target.value);
     tile.col = canvas_width/tile.size;
     tile.row = canvas_height/tile.size;
-color = d3.scaleSequential(d3["interpolate"+colorselect.value]).domain([0,tile.col])
-p.setup(grid(tile.col, tile.row), cmp);
-//p.tileset('#sandbox', tile);
-//p.add(insertionsort, insertionsort_binary, quicksort, quicksort_dualpivot);
-p.rebuild();
-p.startAll();
+    color = d3.scaleSequential(d3["interpolate"+colorselect.value]).domain([0,tile.col])
+    p.setup(grid(tile.col, tile.row), cmp);
+    p.rebuild();
+    p.startAll();
 });
 
 var grid = function(col, row){
@@ -272,37 +274,47 @@ function shuffle(array){
 
 
 var p;
-p = new pixelsort(grid(default_tile_col, default_tile_row), cmp);
-
+p = new pixelsort(grid(tile.col, tile.row), cmp);
 p.tileset(tile);
-var d = document.createElement("div");
-d.className = "sort" 
-document.getElementById("sandbox").appendChild(d);
-p.attach(d);
-p.create(insertionsort);
-var tag = document.createElement("div");
-tag.className = "tag";
-tag.innerHTML = "insertionsort"
-d.appendChild(tag);
 
-d = document.createElement("div");
-d.className = "sort" 
-document.getElementById("sandbox").appendChild(d);
-p.attach(d);
-p.create(insertionsort_binary);
-var tag = document.createElement("div");
-tag.className = "tag";
-tag.innerHTML = "insertionsort"
-d.appendChild(tag);
 
-p.loop(2);
-p.startAll();
+var algorithms = [
+        [insertionsort, "InsertionSort", true], 
+        [insertionsort_binary, "Binary InsertionSort", false],
+        [lampsort,"LampSort", false],
+        [quicksort,"QuickSort", true],
+        [quicksort_dualpivot,"DualPivot QuickSort", false]
+];
 
-var chk = document.getElementById("algorithms");
-var algorithms = [insertionsort, insertionsort_binary, lampsort, quicksort, quicksort_dualpivot];
-algorithms.forEach((fn)=>{
-let n = fn.name;
-chk.innerHTML += '<input type="checkbox" id="'+n+'" name="'+n+'" value="'+n+'" /><label for="'+n+'">'+n+'</label>';
+var sortbox = document.getElementById("algorithms");
+
+algorithms.forEach((el,index)=>{
+    var n = el[0].name,
+        name = el[1],
+        start = el[2];
+    sortbox.innerHTML += '<input type="checkbox" id="'+n+'" name="sort" value="'+index+'" '+(start?"checked":"")+'/><label for="'+n+'">'+name+'</label>';
 });
+build();
+
+function build(){
+    //p.clear();
+    document.getElementById("sandbox").innerHTML = '';
+    var index;
+    document.querySelectorAll('input[name="sort"]:checked').forEach((e)=>{
+        index = e.value;
+        var d = document.createElement("div");
+        d.className = "sort" 
+        document.getElementById("sandbox").appendChild(d);
+        p.attach(d);
+        p.create(algorithms[index][0]);
+        var tag = document.createElement("div");
+        tag.className = "tag";
+        tag.innerHTML = algorithms[index][1];
+        d.appendChild(tag);
+    });
+    p.loop(2);
+    p.startAll();
+}
+
 </script>
 </body>
