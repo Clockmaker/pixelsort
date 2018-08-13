@@ -46,13 +46,13 @@ default_tile_row = canvas_height/default_tile_size ,
 default_tile_col = canvas_width/default_tile_size,
 tile = {col:default_tile_col, row:default_tile_row, size:default_tile_size};
 /*************************************************************/
-var pixelcanvas = function(parent_id, tile = {col:100, row:1, size:10}, canvas_class=null) {
-    this.canvas = d3.select(parent_id)
-            .append("canvas")
-            .attr("width", tile.col*tile.size)
-            .attr("height", tile.row*tile.size);
+var pixelcanvas = function(dom, tile = {col:100, row:1, size:10}, canvas_class=null) {
+    this.canvas = document.createElement("canvas");
+    this.canvas.width = tile.col*tile.size;
+    this.canvas.height = tile.row*tile.size;
+    dom.appendChild(this.canvas);
     if(canvas_class) this.canvas.attr("class", canvas_class);
-    this.context = this.canvas.node().getContext("2d");
+    this.context = this.canvas.getContext("2d");
 
     this.row = tile.row;
     this.tile = {col:tile.col, row:tile.row, size:tile.size};
@@ -121,9 +121,13 @@ function pixelsort(array, compare_fn){
     this.fn_ptr = {};
     this.run = true;
     this.tile = {col:100, row:1, size:1};
+    this.dom = document.body;
 
     this.tileset = function(tile){
         this.tile = tile;
+    };
+    this.attach = function(dom){
+        this.dom = dom;
     };
     this.setup = function(array, compare_fn){
         this.array = array;
@@ -138,7 +142,7 @@ function pixelsort(array, compare_fn){
                 swap_history[row] = [];
                 algo(this.array[row].slice(0), this.compare);
             }
-            this.fn_list[key] = new pixelcanvas(this.node_id, this.tile);
+            this.fn_list[key] = new pixelcanvas(this.dom, this.tile);
             this.fn_list[key].animate(this.array, swap_history);
             this.fn_ptr[key] = algo;//window[key];
     };
@@ -241,7 +245,8 @@ var p;
 
 p = new pixelsort(grid(default_tile_col, default_tile_row), cmp);
 p.tileset(tile);
-p.add(insertionsort_binary);
+//p.attach()
+p.create(insertionsort_binary);
 
 p.startAll();
 
