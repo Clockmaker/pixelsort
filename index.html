@@ -77,6 +77,20 @@ p.rebuild();
 p.startAll();
 });
 
+var p;
+
+p = new pixelsort(grid(default_tile_col, default_tile_row), cmp);
+p.tileset('#sandbox', tile);
+p.add(insertionsort, quicksort);
+
+p.startAll();
+
+var chk = document.getElementById("algorithms");
+var algorithms = [insertionsort, insertionsort_binary, lampsort, quicksort, quicksort_dualpivot];
+algorithms.forEach((fn)=>{
+let n = fn.name;
+chk.innerHTML += '<input type="checkbox" id="'+n+'" name="'+n+'" value="'+n+'" /><label for="'+n+'">'+n+'</label>';
+});
 
 var pixelcanvas = function(parent_id, tile = {col:100, row:1, size:10}, canvas_class=null) {
     this.canvas = d3.select(parent_id)
@@ -244,20 +258,7 @@ function pixelsort(array, compare_fn){
 
 
 
-var p;
 
-p = new pixelsort(grid(default_tile_col, default_tile_row), cmp);
-p.tileset('#sandbox', tile);
-p.add(insertionsort, quicksort);
-
-p.startAll();
-
-var chk = document.getElementById("algorithms");
-var algorithms = [insertionsort, insertionsort_binary, lampsort, quicksort, quicksort_dualpivot];
-algorithms.forEach((fn)=>{
-let n = fn.name;
-chk.innerHTML += '<input type="checkbox" id="'+n+'" name="'+n+'" value="'+n+'" /><label for="'+n+'">'+n+'</label>';
-});
 
 </script>
 </body>
