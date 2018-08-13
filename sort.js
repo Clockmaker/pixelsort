@@ -1,22 +1,13 @@
 // ugly globals
 var swap_history = [], row = 0;
-/*************************************************************/
-//Fisher--Yates' shuffle
-//nicely explained and visualized here, https://bost.ocks.org/mike/shuffle/
-function shuffle(array){
-    var m = array.length, rand;
-    while(--m){
-            rand = ~~(Math.random()*m);
-            [array[m], array[rand]] = [array[rand], array[m]];
-    }
-}
-/*************************************************************/
 
+/*************************************************************/
 function swap(array,i,j){
     [array[i], array[j]] = [array[j], array[i]];
     swap_history[row].push([i,j, array[i],array[j]]);
 }
 /*************************************************************/
+
 
 function insertionsort(array, compare_fn){
 	for(var i=0;i < array.length; i++){
@@ -26,87 +17,55 @@ function insertionsort(array, compare_fn){
 	}
 return array;
 }
-//TODO
-            //if(left){for(var j=end; j>middle;j--){swap(array, j, j-1);}}else{for(var j=start; j<middle;j++){swap(array, j, j-1);}}
+
 function insertionsort_binary(array, compare_fn){
 	var search, value, start, end, middle, now;
 
+    function moveupto(i,j){for(; i<j;i++){swap(array, i, i+1);}}
+    function movedownto(j,i){for(; j>i;j--){swap(array, j, j-1);}}
 
-        //var MAX = 200;
-function moveupto(i,j){if(i>=j){return;}
-//console.log('move up from '+i+' to '+j)
-for(; i<j;i++){swap(array, i, i+1);}
-
-}
-function movedownto(j,i){if(i>=j){return;}
-//console.log('move down from '+j+' to '+i)
-for(; j>i;j--){swap(array, j, j-1);}}
-
-//console.log(""+array)
-//*/
 	for(var sorted = 1; sorted < array.length; sorted++){
 		value = array[sorted];
-//console.log('move '+value)
 		start = 0;
 		end = sorted-1;
         now = sorted;
 		search=true;
 
-		while(search){// && MAX-- >0){
-//console.log('start '+start + ' end '+ end+' now '+now)
+		while(search){
             middle= ~~((end+start)/2 );
-//console.log('middle ('+middle+') '+array[middle])
 			if(compare_fn(array[middle],value)){
-//console.log('smaller')
                 if(now>middle) {
-//console.log('movedownto')
-movedownto(now,middle);
-now=middle;
-end++;
-} else {
-moveupto(now,middle-1);
-now=middle-1;
-start--;
-}
-                
+                    movedownto(now,middle);
+                    now=middle;
+                    end++;
+                } else {
+                    moveupto(now,middle-1);
+                    now=middle-1;
+                    start--;
+                }
 				end=middle-1;
-                
-				if(!compare_fn(array[middle-1], value)){//array[-1]=undefined=0
-					//search=false;
-				}
 			}else{
-//console.log('bigger')
-if(now>middle) {
-movedownto(now,middle+1);
-now=middle+1;
-start = middle+2
-end++;
-} else {
-moveupto(now,middle);
-now=middle;
-start=middle;
-start++;
-}
-   
-
+                if(now>middle) {
+                    movedownto(now,middle+1);
+                    now=middle+1;
+                    start = middle+2
+                    end++;
+                } else {
+                    moveupto(now,middle);
+                    now=middle;
+                    start=middle;
+                    start++;
+                }
 				middle++;
-				if(compare_fn(array[middle],value) || middle==sorted){
-					//search=false;
-				}
 			}
-        if(( !compare_fn( array[now-1],value) ) && ( compare_fn(array[now+1], value) || now==sorted) ) {
-search=false
-//console.log('found '+array[now-1]+' '+array[now]+' '+array[now+1])
-}
-//console.log(""+array);
+        if(( !compare_fn( array[now-1],value) ) 
+             && ( compare_fn(array[now+1], value) || now==sorted) )
+            search=false;
+
 		}
 
-             
-		
-		//for(var j=sorted; j>moveto; j--){swap(array, j, j-1)}
 	}
-//*/
-return array;
+    return array;
 }
 
 
