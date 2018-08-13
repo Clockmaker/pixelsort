@@ -137,19 +137,19 @@ function pixelsort(array, compare_fn){
     };
     //TODO: create multiple istances for the same algorithm
     this.create = function(algo){
-            var key = (typeof algo === 'function') ? algo.name
-                                                   : algo;
-            //careful: global row and swap_history
-            swap_history = [];
-            for(row=0; row < this.tile.row; row++){
-                swap_history[row] = [];
-                algo(this.array[row].slice(0), this.compare);
-            }
-            
-            this.fn_list[key] = new pixelcanvas(this.dom, this.tile);
-            this.fn_list[key].animate(this.array, swap_history);
-            this.fn_ptr[key] = algo;//window[key];
-            this.loop(this.loop_mode);
+        var key = (typeof algo === 'function') ? algo.name
+                                               : algo;
+        //careful: global row and swap_history
+        swap_history = [];
+        for(row=0; row < this.tile.row; row++){
+            swap_history[row] = [];
+            algo(this.array[row].slice(0), this.compare);
+        }
+        
+        this.fn_list[key] = new pixelcanvas(this.dom, this.tile);
+        this.fn_list[key].animate(this.array, swap_history);
+        this.fn_ptr[key] = algo;//window[key];
+        this.loop(this.loop_mode);
     };
     this.loop = function(mode=1){
         this.loop_mode = mode;
