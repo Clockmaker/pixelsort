@@ -7,8 +7,9 @@
 html,body{min-height:100%;margin:0;background-color:#EFEFEF;font-family:sans-serif;font-size:12px;}
 #wrap{margin:1em auto;width:60%;}
 #sandbox{margin-top:2em;}
-/*canvas{display:block;width:100%;}*/
-.tag {transform:rotate(-90deg);transform-origin:top left;float:left;background-color:#000;color:#FFF;padding:1px 4px}
+canvas{display:block;}
+.sort{position:relative;float:left;}
+.tag {position:absolute;display:inline; left:4px;top:8px;background-color:rgba(0,0,0,.7);color:#FFF;padding:4px}
 /*Mobile*/
 @media(max-width: 960px){html{font-size:12px;}#wrap{margin:1em 1%;width:98%;}
 </style>
@@ -30,9 +31,7 @@ html,body{min-height:100%;margin:0;background-color:#EFEFEF;font-family:sans-ser
     <div id="algorithms"></div>
  </details>
 
-<div id="sandbox">
-<div class="tag">insertionsort</div>
-</div>
+<div id="sandbox"></div>
 </div>
 <script src="https://d3js.org/d3.v5.min.js"></script>
 <script src="./sort.js"></script>
@@ -119,6 +118,7 @@ function pixelsort(array, compare_fn){
     this.compare = compare_fn;
     this.fn_list = {};
     this.fn_ptr = {};
+    this.fn_dom = {};
     this.run = true;
     this.tile = {col:100, row:1, size:1};
     this.dom = document.body;
@@ -133,6 +133,7 @@ function pixelsort(array, compare_fn){
         this.array = array;
         this.compare = compare_fn;
     };
+    //TODO: create multiple istances for the same algorithm
     this.create = function(algo){
             var key = (typeof algo === 'function') ? algo.name
                                                    : algo;
@@ -142,7 +143,12 @@ function pixelsort(array, compare_fn){
                 swap_history[row] = [];
                 algo(this.array[row].slice(0), this.compare);
             }
-            this.fn_list[key] = new pixelcanvas(this.dom, this.tile);
+            var dom = this.fn_dom[key];
+            if(!dom){
+                dom = this.dom;
+                this.fn_dom[key] = dom;
+            }
+            this.fn_list[key] = new pixelcanvas(dom, this.tile);
             this.fn_list[key].animate(this.array, swap_history);
             this.fn_ptr[key] = algo;//window[key];
     };
@@ -160,7 +166,7 @@ function pixelsort(array, compare_fn){
     this.rebuild = function(){
         for(var key in this.fn_list){
             this.remove(key);
-            this.add(this.fn_ptr[key]);
+            this.create(this.fn_ptr[key]);
         }
     }
     this.remove = function(algo){
@@ -242,11 +248,29 @@ function shuffle(array){
 
 
 var p;
-
 p = new pixelsort(grid(default_tile_col, default_tile_row), cmp);
+
 p.tileset(tile);
-//p.attach()
+var d = document.createElement("div");
+d.className = "sort" 
+document.getElementById("sandbox").appendChild(d);
+p.attach(d);
+p.create(insertionsort);
+var tag = document.createElement("div");
+tag.className = "tag";
+tag.innerHTML = "insertionsort"
+d.appendChild(tag);
+
+d = document.createElement("div");
+d.className = "sort" 
+document.getElementById("sandbox").appendChild(d);
+p.attach(d);
 p.create(insertionsort_binary);
+var tag = document.createElement("div");
+tag.className = "tag";
+tag.innerHTML = "insertionsort"
+d.appendChild(tag);
+
 
 p.startAll();
 
