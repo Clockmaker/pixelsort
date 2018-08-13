@@ -66,6 +66,7 @@ pixelcanvas.prototype = {
         let max = 0;
         this.frame.forEach((r)=>{if(max < r.length) max=r.length;})
         
+        this.duration = max;
         this.frame_length = max;
         
         this.reset();
@@ -92,18 +93,16 @@ pixelcanvas.prototype = {
         this.context.closePath();
     },
     draw: function(){
-        var end = this.row, s;
+        var s;
         for(var row = 0; row < this.row; row++){
             if(this.step < this.frame[row].length){
                 s = this.frame[row][this.step];
                 this.draw_tile(s[0], row, s[2]);
                 this.draw_tile(s[1], row, s[3]);
-            }else{
-                end--;
             }
         }
         this.step++
-        if(end == 0){
+        if(this.step > this.duration){
             this.reset()
         }
         if(this.play) requestAnimationFrame(this.draw.bind(this));
