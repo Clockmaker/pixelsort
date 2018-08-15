@@ -10,6 +10,13 @@ html,body{min-height:100%;margin:0;background-color:#EFEFEF;font-family:sans-ser
 canvas{display:block;}
 .sort{position:relative;}
 .tag {position:absolute;display:inline-block;left:4px;top:8px;background-color:rgba(0,0,0,.7);color:#FFF;padding:4px}
+#algorithms {display:inline-block;}
+#algorithms input {display:none !important;}
+#algorithms input:checked + label {background-color:#000;color:#FFF;}
+#algorithms label {padding:4px;margin-right:1em; border:1px solid #000;}
+button {padding:8px 16px;background-color:#555;color:#FFF;border:none;border-radius:4px;}
+button:hover {background-color:#444;}
+button:active {background-color:#000;}
 /*Mobile*/
 @media(max-width: 960px){
 html{font-size:12px;}
@@ -32,8 +39,7 @@ canvas{max-width:100%}
 <br/>
  <details>
  <summary>Sorting Algorithms</summary>
-    <div id="algorithms">
-    </div>
+   <div id="algorithms"></div>
  <button onclick="build()">Update</button>
  <button onclick="p.reset()">Reset</button>
  </details>
@@ -296,7 +302,7 @@ algorithms.forEach((el,index)=>{
     var n = el[0].name,
         name = el[1],
         start = el[2];
-    sortbox.innerHTML += '<input type="checkbox" id="'+n+'" name="sort" value="'+index+'" '+(start?"checked":"")+'/><label for="'+n+'">'+name+'</label>';
+    sortbox.innerHTML += '<input type="checkbox" id="'+n+'" name="sort" value="'+index+'" '+(start?"checked":"")+'/><label for='+n+'>'+name+'</label>';
 });
 build();
 
