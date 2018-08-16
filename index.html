@@ -11,13 +11,13 @@ button,select,input,label{margin:0 2px .5em 0;line-height:1.5;border-radius:4px;
 canvas{display:block;}
 details{margin:1em 0;}
 .sort{position:relative;}
-.tag {position:absolute;display:inline-block;left:4px;top:8px;background-color:rgba(0,0,0,.7);color:#FFF;padding:4px}
+.tag {position:absolute;display:inline-block;left:0px;top:0px;background-color:rgba(0,0,0,.7);color:#FFF;padding:4px}
 #algorithms {display:flex;flex-wrap:wrap;width:100%;margin:1em 0;}
   #algorithms label {padding:4px;border:1px solid #888;}
   #algorithms label:hover {background-color:#CCC;}
   #algorithms input {display:none !important;}
   #algorithms input:checked + label {background-color:#666;color:#FFF;border-color:#666;}
-button,input[type="button"] {padding:.5em 1em;background-color:#444;color:#FFF;border:none;font-size:16px;text-transform:uppercase;}
+button,input[type="button"] {padding:.5em 1em;background-color:#444;color:#FFF;border:none;text-transform:uppercase;}
   button:hover,input[type="button"]:hover {background-color:#666;}
   button:active,input[type="button"]:active {background-color:#000;}
 select{padding:.6em;border:1px solid #CCC;}
@@ -31,12 +31,19 @@ canvas{max-width:100%}
 </style>
 </head><body>
 <div id="menu">
- <select id="tile_color">
+ <select id="tile_color"></select>
+ <select id="tile_canvas">
+  <option value='100x10' selected>100x10</option>
+  <option value='100x20'>100x20</option>
+  <option value='100x50'>100x50</option>
+  <option value='100x100'>100x100</option>
+  <option value='50x100'>50x100</option>
+  <option value='200x20'>200x20</option>
  </select>
  <select id="tile_size">
-  <option value='2'> 2 px</option>
-  <option value='4'> 4 px</option>
-  <option value='8'> 8 px</option>
+  <option value='2'>2 px</option>
+  <option value='4'>4 px</option>
+  <option value='8' selected>8 px</option>
   <option value='16'>16 px</option>
  </select>
  <button onclick="p.reset()">Reset</button>
@@ -53,10 +60,10 @@ canvas{max-width:100%}
 <script src="./sort.js"></script>
 <script>
 var 
-canvas_width = 400, canvas_height=400,
+default_canvas_width = 400, default_canvas_height = 400,
 default_tile_size = 8,
-default_tile_row = canvas_height/default_tile_size ,
-default_tile_col = canvas_width/default_tile_size,
+default_tile_col = 100,
+default_tile_row = 10,
 tile = {col:default_tile_col, row:default_tile_row, size:default_tile_size};
 var cmp = (a,b)=>{return a>b};
 /*************************************************************/
@@ -238,9 +245,6 @@ function pixelsort(array, compare_fn){
 
 var color = d3.scaleSequential(d3.interpolateViridis).domain([0,tile.col]);
 
-
-
-
 /*
 if(window.location.hash){
 tile.size = Number(window.location.hash.substring(1));
@@ -259,13 +263,23 @@ colorselect.addEventListener("change", function(e){
 
 var tileselect = document.getElementById("tile_size");
 tileselect.value = tile.size;
+
 tileselect.addEventListener("change",function(e){
     tile.size = Number(e.target.value);
-    tile.col = canvas_width/tile.size;
-    tile.row = canvas_height/tile.size;
-    color = d3.scaleSequential(d3["interpolate"+colorselect.value]).domain([0,tile.col])
     p.setup(grid(tile.col, tile.row), cmp);
-   build();
+    build();
+    p.startAll();
+});
+var tilecanvas = document.getElementById("tile_canvas");
+tilecanvas.value = '100x10';
+
+tilecanvas.addEventListener("change",function(e){
+    [w,h] = e.target.value.split('x')
+    tile.col = Number(w);
+    tile.row = Number(h);
+    color = d3.scaleSequential(d3["interpolate"+colorselect.value]).domain([0,tile.col]);
+    p.setup(grid(tile.col, tile.row), cmp);
+    build();
     p.startAll();
 });
 
