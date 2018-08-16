@@ -4,19 +4,20 @@
 <title>Pixel Sort</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0 user-scalable=0, shrink-to-fit=no">
 <style>
-html,body{min-height:100%;margin:0;background-color:#EFEFEF;font-family:sans-serif;font-size:12px;}
-button,select,input,label{line-height:1.5;border-radius:4px;vertical-align:middle;}
+html,body{min-height:100%;margin:0;background-color:#EFEFEF;font-family:Roboto,sans-serif;font-size:14px;}
+button,select,input,label{margin:0 1em .5em 0;line-height:1.5;border-radius:4px;vertical-align:middle;}
 #menu{margin:1em auto;width:60%;}
-#sandbox{margin:2em;display:flex;justify-content:center;flex-wrap:wrap;}
+#sandbox{display:flex;justify-content:center;flex-wrap:wrap;}
 canvas{display:block;}
+details{margin:1em 0;}
 .sort{position:relative;}
 .tag {position:absolute;display:inline-block;left:4px;top:8px;background-color:rgba(0,0,0,.7);color:#FFF;padding:4px}
 #algorithms {display:flex;flex-wrap:wrap;width:100%;margin:1em 0;}
-  #algorithms label {padding:4px;margin:0 1em 1em 0; border:1px solid #888;}
+  #algorithms label {padding:4px;border:1px solid #888;}
   #algorithms label:hover {background-color:#CCC;}
   #algorithms input {display:none !important;}
   #algorithms input:checked + label {background-color:#666;color:#FFF;border-color:#666;}
-button,input[type="button"] {padding:.5em 1em;background-color:#444;color:#FFF;border:none;font-size:125%;}
+button,input[type="button"] {padding:.5em 1em;background-color:#444;color:#FFF;border:none;font-size:16px;text-transform:uppercase;}
   button:hover,input[type="button"]:hover {background-color:#666;}
   button:active,input[type="button"]:active {background-color:#000;}
 select{padding:.6em;border:1px solid #CCC;}
@@ -25,7 +26,7 @@ select{padding:.6em;border:1px solid #CCC;}
 html{font-size:12px;}
 canvas{max-width:100%}
 #menu{margin:1em auto;width:98%;}
-#sandbox{margin:2em 0;}
+#sandbox{}
 }
 </style>
 </head><body>
@@ -38,7 +39,7 @@ canvas{max-width:100%}
   <option value='8'> 8 px</option>
   <option value='16'>16 px</option>
  </select>
- <input type="button" style="float:right" onclick='this.value=p.play()?"Play":"Stop"' value="Stop"/>
+ <input type="button" onclick='this.value=p.play()?"Play":"Stop"' value="Stop"/>
 <br/>
  <details>
  <summary>Sorting Algorithms</summary>
